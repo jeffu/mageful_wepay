@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Mageful_Wepay>
+			<active>true</active>
+			<codePool>local</codePool>
+		</Mageful_Wepay>
+	</modules>
+</config>
