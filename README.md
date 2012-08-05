@@ -17,6 +17,17 @@ Online Capturing, Voiding and Invoicing are all complete.
 The only option is for delayed capture currently. Capture online 
 occurs on Invoice properly.
 
+License
+======
+
+This code is licensed open source under Academic Free License ("AFL") v. 3.0
+http://opensource.org/licenses/AFL-3.0 . You are free to use it in accordance
+with the license. As indicated in section (7), note that "the Original Work is 
+provided under  this License on an "AS IS" BASIS and WITHOUT WARRANTY, either 
+express or implied, including, without limitation, the warranties of
+non-infringement, merchantability or fitness for a particular purpose. 
+THE ENTIRE RISK AS TO THE QUALITY OF THE ORIGINAL WORK IS WITH YOU."
+
 
 TODO
 =============
