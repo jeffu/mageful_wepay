@@ -104,7 +104,7 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 			$this->getSession()->setLastQuoteId($quote->getId())
 				   ->setLastSuccessQuoteId($quote->getId())
 				   ->setLastOrderId($order->getId());
-			
+
 			switch ($order->getState()) {
 				// even after placement paypal can disallow to authorize/capture, but will wait until bank transfers money
 				case Mage_Sales_Model_Order::STATE_PENDING_PAYMENT:
@@ -162,6 +162,31 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 			}
 		}
 		return $this->_quote->getCheckoutMethod();
+	}
+
+	// plugin method listener
+	public function adminAction() {
+
+		$key = Mage::app()->loadCache(Mageful_Wepay_Helper_Data::WEPAY_PLUGIN_API_AUTH);
+		$auth = $this->getRequest()->getParam('auth');
+			$post = $this->getRequest()->getParams();
+			Mage::log(var_export($post, true));
+
+		if ($auth == $key && isset($post['account_id']) && isset($post['access_token'])) {
+			$post = $this->getRequest()->getParams();
+
+			Mage::log(var_export($post, true));
+
+			$resource = Mage::getResourceModel('core/setup');
+
+			$resource->setConfigData('payment/wepay/account_id',$post['account_id']);
+			$resource->setConfigData('payment/wepay/access_token',Mage::helper('core')->encrypt($post['access_token']));
+
+		}
+		else {
+			$this->_redirectUrl(Mage_Adminhtml_Helper_Data::getUrl('adminhtml/system_config/edit', array('section'=>'payment')));
+		}
+		Mage::log('admin wepay hit');
 	}
 
 }
