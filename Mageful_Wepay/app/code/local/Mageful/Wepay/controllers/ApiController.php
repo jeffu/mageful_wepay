@@ -130,10 +130,13 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 
 	protected function initWepay() {
 
-		if ($this->getConfig('testmode') == 1) {
-			Wepay::useStaging($this->getConfig('client_id'), $this->getConfig('password'));
-		} else {
-			Wepay::useProduction($this->getConfig('client_id'), $this->getConfig('password'));
+		if (!Mage::registry(Mageful_Wepay_Model_Wepay::INIT_REGISTRY_KEY)) {
+			if ($this->getConfig('testmode') == 1) {
+				Wepay::useStaging($this->getConfig('client_id'), $this->getConfig('password'));
+			} else {
+				Wepay::useProduction($this->getConfig('client_id'), $this->getConfig('password'));
+			}
+			Mage::register(Mageful_Wepay_Model_Wepay::INIT_REGISTRY_KEY, true);
 		}
 	}
 
@@ -169,8 +172,8 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 
 		$key = Mage::app()->loadCache(Mageful_Wepay_Helper_Data::WEPAY_PLUGIN_API_AUTH);
 		$auth = $this->getRequest()->getParam('auth');
-			$post = $this->getRequest()->getParams();
-			Mage::log(var_export($post, true));
+		$post = $this->getRequest()->getParams();
+		Mage::log(var_export($post, true));
 
 		if ($auth == $key && isset($post['account_id']) && isset($post['access_token'])) {
 			$post = $this->getRequest()->getParams();
@@ -179,12 +182,10 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 
 			$resource = Mage::getResourceModel('core/setup');
 
-			$resource->setConfigData('payment/wepay/account_id',$post['account_id']);
-			$resource->setConfigData('payment/wepay/access_token',Mage::helper('core')->encrypt($post['access_token']));
-
-		}
-		else {
-			$this->_redirectUrl(Mage_Adminhtml_Helper_Data::getUrl('adminhtml/system_config/edit', array('section'=>'payment')));
+			$resource->setConfigData('payment/wepay/account_id', $post['account_id']);
+			$resource->setConfigData('payment/wepay/access_token', Mage::helper('core')->encrypt($post['access_token']));
+		} else {
+			$this->_redirectUrl(Mage_Adminhtml_Helper_Data::getUrl('adminhtml/system_config/edit', array('section' => 'payment')));
 		}
 		Mage::log('admin wepay hit');
 	}

@@ -4,6 +4,7 @@ require_once Mage::getBaseDir('lib') . DS . 'wepay' . DS . 'wepay.php';
 
 class Mageful_Wepay_Model_Wepay extends Mage_Payment_Model_Method_Abstract {
 	const ADD_INFO_CHECKOUT_ID_KEY = 'wepay_checkout_id';
+	const INIT_REGISTRY_KEY = 'wepay_class_init';
 
 	const STATE_AUTHORIZED = 'authorized';
 	const STATE_CAPTURED = 'captured';
@@ -91,6 +92,7 @@ class Mageful_Wepay_Model_Wepay extends Mage_Payment_Model_Method_Abstract {
 			}
 		} catch (Excaption $e) {
 			$error = $e->getMessage();
+			Mage::logException($e);
 		}
 
 		if ($error !== false) {
@@ -114,12 +116,12 @@ class Mageful_Wepay_Model_Wepay extends Mage_Payment_Model_Method_Abstract {
 			if ($payment->getAmountAuthorized() == $amount) {
 				$request = array('checkout_id' => $checkout_id,
 				    'refund_reason' => 'A credit memo was created by magento.',
-					   );
+				);
 			} else {
 				$request = array('checkout_id' => $checkout_id,
 				    'refund_reason' => 'A credit memo was created by magento.',
 				    'amount' => $amount,
-					   );
+				);
 			}
 
 			$info = $wepay->request('checkout/refund', $request);
@@ -130,6 +132,7 @@ class Mageful_Wepay_Model_Wepay extends Mage_Payment_Model_Method_Abstract {
 //			}
 		} catch (Excaption $e) {
 			$error = $e->getMessage();
+			Mage::logException($e);
 		}
 
 		if ($error !== false) {
@@ -169,10 +172,15 @@ class Mageful_Wepay_Model_Wepay extends Mage_Payment_Model_Method_Abstract {
 
 	protected function initWepay() {
 
-		if ($this->getConfigData('testmode') == 1) {
-			Wepay::useStaging($this->getConfigData('client_id'), $this->getConfigData('password'));
-		} else {
-			Wepay::useProduction($this->getConfigData('client_id'), $this->getConfigData('password'));
+		if (!Mage::registry(self::INIT_REGISTRY_KEY)) {
+
+			if ($this->getConfigData('testmode') == 1) {
+				Wepay::useStaging($this->getConfigData('client_id'), $this->getConfigData('password'));
+			} else {
+				Wepay::useProduction($this->getConfigData('client_id'), $this->getConfigData('password'));
+			}
+
+			Mage::register(self::INIT_REGISTRY_KEY, true);
 		}
 	}
 
