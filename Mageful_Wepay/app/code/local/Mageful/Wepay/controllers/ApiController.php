@@ -173,12 +173,12 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 		$key = Mage::app()->loadCache(Mageful_Wepay_Helper_Data::WEPAY_PLUGIN_API_AUTH);
 		$auth = $this->getRequest()->getParam('auth');
 		$post = $this->getRequest()->getParams();
-		Mage::log(var_export($post, true));
+		//Mage::log(var_export($post, true));
 
 		if ($auth == $key && isset($post['account_id']) && isset($post['access_token'])) {
 			$post = $this->getRequest()->getParams();
 
-			Mage::log(var_export($post, true));
+			//Mage::log(var_export($post, true));
 
 			$resource = new Mage_Core_Model_Resource_Setup('core_setup');
 
@@ -186,6 +186,8 @@ class Mageful_Wepay_ApiController extends Mage_Core_Controller_Front_Action {
 			$resource->setConfigData('payment/wepay/client_id', $post['app_id']);
 			$resource->setConfigData('payment/wepay/access_token', Mage::helper('core')->encrypt($post['access_token']));
 			$resource->setConfigData('payment/wepay/password', Mage::helper('core')->encrypt($post['app_secret']));
+			
+			Mage::getConfig()->cleanCache();
 		}
 
 		Mage::log('admin wepay hit');
